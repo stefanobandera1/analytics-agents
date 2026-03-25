@@ -444,11 +444,20 @@ with a full table mapping every module to an agent before writing any code.
 
 ## Publishing roadmap
 
-1. Build and test the MCP server locally (connect to Claude Desktop via `claude_desktop_config.json`)
-2. Add `pyproject.toml` to `analytics-agents/` with proper metadata and dependencies
-3. Write README with install and configuration instructions
-4. Publish to PyPI (same tag-triggered flow as `adsat`)
-5. Submit to the MCP community registry: https://github.com/modelcontextprotocol/servers
+### GitHub / PyPI (as of 2026-03-25)
+
+- **GitHub repo**: `https://github.com/stefanobandera1/analytics-agents`
+- **PyPI**: `analytics-agents` v0.1.2 — published via OIDC trusted publishing
+- **CI**: Python 3.10–3.13 × Ubuntu / Windows / macOS — passing
+- **requires-python**: `>=3.10` — `mcp>=1.26.0` has no release for Python 3.9
+
+### Steps
+
+1. ✓ Build and test the MCP server locally (`run_end_to_end.py` passing)
+2. ✓ `pyproject.toml` with proper metadata, deps, and `[project.urls]`
+3. ✓ README with install, Claude Desktop config, tools table, orchestration design
+4. ✓ Published to PyPI — tag-triggered OIDC (same flow as adsat)
+5. ☐ Submit to MCP community registry: https://github.com/modelcontextprotocol/servers
 
 ### MCP server portability
 
@@ -465,11 +474,14 @@ Rationale: SKILL.md files are tightly coupled to tool contracts in `server.py`. 
 mismatch between a separately distributed SKILL.md and the installed server would produce
 broken behaviour with no clear error. Bundling enforces version alignment automatically.
 
-**Implementation:**
-- Include `skills/` in `pyproject.toml` package data:
+**Implementation (not yet built — deferred to a future session):**
+- `skills/` must be moved **inside** the `agents/` package directory before adding
+  package-data — setuptools package-data paths cannot use `../` to reference files
+  outside the package. Proposed layout: `agents/skills/campaign-analysis/SKILL.md`
+- Then add to `pyproject.toml`:
   ```toml
   [tool.setuptools.package-data]
-  "analytics_agents" = ["skills/**/*.md"]
+  "agents" = ["skills/**/*.md"]
   ```
 - Ship a CLI command `analytics-agents install-skills` that copies bundled SKILL.md files
   to the correct Cowork skills directory using `importlib.resources` + `shutil.copy`
@@ -479,13 +491,9 @@ broken behaviour with no clear error. Bundling enforces version alignment automa
 - Wire in `pyproject.toml`:
   ```toml
   [project.scripts]
-  analytics-agents = "analytics_agents.cli:main"
+  analytics-agents = "agents.cli:main"
   ```
-- README install section must include both steps:
-  ```bash
-  pip install analytics-agents
-  analytics-agents install-skills   # Claude Desktop / Cowork users only
-  ```
+- README already caveats this as "coming in a future release" — update when implemented
 
 ---
 
