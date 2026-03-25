@@ -8,6 +8,14 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+---
+
+## [0.1.1] – 2026-03-25
+
+### Fixed
+- `pyproject.toml`: moved `dependencies` above `[project.urls]` to fix TOML parse error
+  (`project.urls.dependencies` must be string) that broke the PyPI publish build
+
 ### Planned
 - Exploratory / EDA Agent (`run_exploratory_analysis`)
 - Model Diagnostics Agent (`run_model_diagnostics`)
