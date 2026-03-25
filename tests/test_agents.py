@@ -27,7 +27,7 @@ import pytest
 from adsat.budget import BudgetOptimizer
 from adsat.campaign import CampaignSaturationAnalyzer
 
-from agents.campaign_analyst import (
+from adsat_agents.campaign_analyst import (
     _deserialise_batch_result,
     analyse_campaign_saturation,
     generate_report,

@@ -481,7 +481,7 @@ broken behaviour with no clear error. Bundling enforces version alignment automa
 - Then add to `pyproject.toml`:
   ```toml
   [tool.setuptools.package-data]
-  "agents" = ["skills/**/*.md"]
+  "adsat_agents" = ["skills/**/*.md"]
   ```
 - Ship a CLI command `analytics-agents install-skills` that copies bundled SKILL.md files
   to the correct Cowork skills directory using `importlib.resources` + `shutil.copy`
@@ -491,7 +491,7 @@ broken behaviour with no clear error. Bundling enforces version alignment automa
 - Wire in `pyproject.toml`:
   ```toml
   [project.scripts]
-  analytics-agents = "agents.cli:main"
+  analytics-agents = "adsat_agents.cli:main"
   ```
 - README already caveats this as "coming in a future release" — update when implemented
 

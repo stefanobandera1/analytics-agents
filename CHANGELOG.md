@@ -10,6 +10,14 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [0.1.3] – 2026-03-25
+
+### Changed
+- Renamed importable package from `agents` to `adsat_agents` to avoid potential name
+  clashes with other packages; PyPI distribution name (`analytics-agents`) unchanged
+
+---
+
 ## [0.1.2] – 2026-03-25
 
 ### Fixed

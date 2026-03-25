@@ -52,7 +52,7 @@ import pandas as pd
 # ---------------------------------------------------------------------------
 sys.path.insert(0, os.path.dirname(__file__))
 
-from agents.campaign_analyst import (
+from adsat_agents.campaign_analyst import (
     analyse_campaign_saturation,
     generate_report,
     optimise_budget,

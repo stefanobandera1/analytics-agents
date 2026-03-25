@@ -20,7 +20,7 @@ Or, once a ``[project.scripts]`` entry point is added to ``pyproject.toml``::
 
 from mcp.server.fastmcp import FastMCP
 
-from agents.campaign_analyst import (
+from adsat_agents.campaign_analyst import (
     analyse_campaign_saturation,
     generate_report,
     optimise_budget,
