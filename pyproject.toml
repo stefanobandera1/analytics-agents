@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "analytics-agents"
+version = "0.1.0"
+description = "MCP server exposing adsat analytics functions as conversational tools"
+readme = "README.md"
+license = "MIT"
+authors = [{ name = "Stefano Bandera", email = "mr.stefanobandera@gmail.com" }]
+requires-python = ">=3.9"
+
+[project.urls]
+Homepage = "https://github.com/stefanobandera1/analytics-agents"
+Repository = "https://github.com/stefanobandera1/analytics-agents"
+Issues = "https://github.com/stefanobandera1/analytics-agents/issues"
+
+dependencies = [
+    "adsat>=0.5.0",
+    "mcp>=1.26.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=5.0",
+    "ruff>=0.4",
+    "black>=24.0",
+]
+
+[tool.black]
+line-length = 100
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
+
+[tool.setuptools.packages.find]
+include = ["agents*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
