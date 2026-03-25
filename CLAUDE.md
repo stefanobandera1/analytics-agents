@@ -444,10 +444,6 @@ with a full table mapping every module to an agent before writing any code.
 
 ## Publishing roadmap
 
-> **Placeholder to update at step 7**: `README.md` uses `https://github.com/stefanobandera1/analytics-agents`
-> as the repo URL. Replace with the actual URL once Claude Code creates the repo. Also update
-> the `[project.urls]` section in `pyproject.toml` at the same time.
-
 1. Build and test the MCP server locally (connect to Claude Desktop via `claude_desktop_config.json`)
 2. Add `pyproject.toml` to `analytics-agents/` with proper metadata and dependencies
 3. Write README with install and configuration instructions

@@ -21,21 +21,14 @@ my £2M budget across these campaigns?"_ — the server handles the tool calls; 
 pip install analytics-agents
 ```
 
-If you are using **Claude Desktop or Cowork**, run one additional command to copy the bundled
-skill files to your skills directory:
+If you are using **Claude Desktop or Cowork**, you will also need the SKILL.md orchestration
+files. These tell Claude which tools to call, in what order, and how to interpret the results.
+They are available in the `skills/` directory of this repo.
 
-```bash
-analytics-agents install-skills
-```
-
-This copies the SKILL.md orchestration files from the package into the directory where Claude
-reads them. It is only needed for Claude-based clients — other MCP clients do not use SKILL.md
-files and can skip this step.
-
-> **Why bundled?** The SKILL.md files are tightly coupled to the tool contracts in `server.py`.
-> Shipping them inside the pip package ensures the skill instructions and the server are always
-> on the same version. A mismatch between a separately distributed skill file and an installed
-> server would produce broken behaviour with no clear error message.
+> **Coming in a future release:** `analytics-agents install-skills` — a CLI command that will
+> copy the bundled SKILL.md files directly to your skills directory. The SKILL.md files ship
+> inside the pip package so that skill instructions and server are always on the same version.
+> For now, copy the files from `skills/` manually to your Claude skills directory.
 
 ---
 
