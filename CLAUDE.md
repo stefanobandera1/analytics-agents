@@ -30,7 +30,7 @@ underlying packages (`adsat`, and future packages). This folder owns:
 analytics-agents/
 ├── CLAUDE.md              ← this file; read before every session
 ├── server.py              ← MCP server entry point; exposes tools to MCP clients
-├── agents/                ← one Python module per agent
+├── adsat_agents/          ← one Python module per agent (importable package)
 │   ├── campaign_analyst.py
 │   ├── exploratory_agent.py
 │   ├── diagnostics_agent.py
@@ -255,7 +255,7 @@ external tool or service where required.
 Tools pass results to each other as JSON strings — no intermediate files or temp storage.
 `analyse_campaign_saturation` → `optimise_budget` → `generate_report` chain via JSON strings.
 
-Private helpers in `agents/campaign_analyst.py`:
+Private helpers in `adsat_agents/campaign_analyst.py`:
 - `_deserialise_batch_result(json_str)` — rebuilds `CampaignBatchResult` from JSON; applies
   `hill_bayesian → hill` substitution and marks Power model / no-saturation-point campaigns
   as `succeeded=False` (excluded from budget optimisation with reason in `excluded_campaigns`)
@@ -344,7 +344,7 @@ with a full table mapping every module to an agent before writing any code.
 ### Agent descriptions
 
 #### 1. Campaign Saturation Agent
-- **File**: `agents/campaign_analyst.py`
+- **File**: `adsat_agents/campaign_analyst.py`
 - **Skill**: `skills/campaign-analysis/SKILL.md`
 - **Purpose**: End-to-end saturation analysis per campaign — from raw data to budget recommendation
 - **adsat modules**: `pipeline.py`, `campaign.py`, `modeling.py`, `evaluation.py`,
@@ -353,7 +353,7 @@ with a full table mapping every module to an agent before writing any code.
   approaching saturation and how to reallocate budget"_
 
 #### 2. Exploratory / EDA Agent
-- **File**: `agents/exploratory_agent.py`
+- **File**: `adsat_agents/exploratory_agent.py`
 - **Skill**: `skills/exploratory/SKILL.md`
 - **Purpose**: Full EDA suite on a dataset before any modelling — distributions, correlations,
   outliers, scatter plots, time series
@@ -361,7 +361,7 @@ with a full table mapping every module to an agent before writing any code.
 - **Typical invocation**: _"Run an exploratory analysis on this dataset before I start modelling"_
 
 #### 3. Model Diagnostics Agent
-- **File**: `agents/diagnostics_agent.py`
+- **File**: `adsat_agents/diagnostics_agent.py`
 - **Skill**: `skills/diagnostics/SKILL.md`
 - **Purpose**: Post-modelling residual diagnostics — checks model health, normality, Cook's D,
   autocorrelation, heteroscedasticity
@@ -369,7 +369,7 @@ with a full table mapping every module to an agent before writing any code.
 - **Typical invocation**: _"Run diagnostics on the model I just fitted for campaign X"_
 
 #### 4. Seasonality Agent
-- **File**: `agents/seasonality_agent.py`
+- **File**: `adsat_agents/seasonality_agent.py`
 - **Skill**: `skills/seasonality/SKILL.md`
 - **Purpose**: CMA decomposition of time-series data; separates trend, seasonal, and residual
   components before saturation modelling
@@ -378,7 +378,7 @@ with a full table mapping every module to an agent before writing any code.
   a strong seasonal pattern I need to account for"_
 
 #### 5. Scenario Simulation Agent
-- **File**: `agents/simulation_agent.py`
+- **File**: `adsat_agents/simulation_agent.py`
 - **Skill**: `skills/simulation/SKILL.md`
 - **Purpose**: What-if scenario planning; compares hypothetical budget allocations against
   baseline and against each other
@@ -387,7 +387,7 @@ with a full table mapping every module to an agent before writing any code.
   budget to Campaign B?"_
 
 #### 6. Attribution Agent
-- **File**: `agents/attribution_agent.py`
+- **File**: `adsat_agents/attribution_agent.py`
 - **Skill**: `skills/attribution/SKILL.md`
 - **Purpose**: Multi-touch attribution across 9 models (last-click, Shapley, Markov, etc.);
   takes journey-level event data
@@ -396,7 +396,7 @@ with a full table mapping every module to an agent before writing any code.
   vs Shapley vs Markov results"_
 
 #### 7. Benchmarking Agent
-- **File**: `agents/benchmarking_agent.py`
+- **File**: `adsat_agents/benchmarking_agent.py`
 - **Skill**: `skills/benchmarking/SKILL.md`
 - **Purpose**: Statistical benchmarking of campaign metrics against historical peers;
   detects change points and flags anomalies
@@ -405,7 +405,7 @@ with a full table mapping every module to an agent before writing any code.
   for its impression volume tier?"_
 
 #### 8. SQL Agent _(future)_
-- **File**: `agents/sql_agent.py`
+- **File**: `adsat_agents/sql_agent.py`
 - **Skill**: _(to be defined)_
 - **Purpose**: Translate natural language questions about campaign data into SQL queries;
   feeds results into other agents
@@ -447,7 +447,7 @@ with a full table mapping every module to an agent before writing any code.
 ### GitHub / PyPI (as of 2026-03-25)
 
 - **GitHub repo**: `https://github.com/stefanobandera1/analytics-agents`
-- **PyPI**: `analytics-agents` v0.1.2 — published via OIDC trusted publishing
+- **PyPI**: `analytics-agents` v0.1.3 — published via OIDC trusted publishing
 - **CI**: Python 3.10–3.13 × Ubuntu / Windows / macOS — passing
 - **requires-python**: `>=3.10` — `mcp>=1.26.0` has no release for Python 3.9
 
@@ -474,17 +474,44 @@ Rationale: SKILL.md files are tightly coupled to tool contracts in `server.py`. 
 mismatch between a separately distributed SKILL.md and the installed server would produce
 broken behaviour with no clear error. Bundling enforces version alignment automatically.
 
-**Implementation (not yet built — deferred to a future session):**
-- `skills/` must be moved **inside** the `agents/` package directory before adding
-  package-data — setuptools package-data paths cannot use `../` to reference files
-  outside the package. Proposed layout: `agents/skills/campaign-analysis/SKILL.md`
+### How SKILL.md loading works per client — confirmed 2026-03-25
+
+Different Claude clients load SKILL.md files through different mechanisms. This is a hard
+constraint that affects the `install-skills` CLI design.
+
+| Client | SKILL.md loading mechanism |
+|---|---|
+| **Cowork** | Loaded automatically from `.claude/skills/` directory. File placement works. `install-skills` CLI targets this path. |
+| **Claude Code** | Loaded automatically from `.claude/skills/` in project or `~/.claude/skills/` globally. File placement works. `install-skills` CLI targets this path. |
+| **Claude Desktop** | Skills uploaded as ZIP files via Settings → Customize → Skills UI. File placement does NOT work. `install-skills` CLI cannot automate this. |
+| **Other MCP clients** | No SKILL.md support. Tools only. |
+
+**Implication for `install-skills`:** the CLI targets Cowork and Claude Code only. Claude
+Desktop users must ZIP the skill folder and upload it manually via Settings → Customize →
+Skills. The README must make this distinction explicit.
+
+**Implication for testing:** to test the full SKILL.md orchestration flow (question rounds,
+quality gates, checkpoints), use Cowork or Claude Code — not Claude Desktop regular chat.
+Claude Desktop requires the ZIP upload before the SKILL.md is active.
+
+**Additional finding from Tier 3 testing (2026-03-25):** even with the SKILL.md active,
+Claude skipped the two-round question flow and ran all three tools in a single turn. The
+SKILL.md was not uploaded to Claude Desktop during the test (which is why it ran without
+skill context), but this failure pattern — compressing the workflow when the user prompt
+seems sufficient — is a known SKILL.md compliance risk. This is additional evidence for
+the LangGraph decision: correctness checkpoints must live in code, not solely in instructions.
+
+**Implementation (not yet built — deferred to v0.2.0):**
+- `skills/` must be moved **inside** the `adsat_agents/` package directory before adding
+  package-data — setuptools package-data paths cannot reference files outside the package.
+  Proposed layout: `adsat_agents/skills/campaign-analysis/SKILL.md`
 - Then add to `pyproject.toml`:
   ```toml
   [tool.setuptools.package-data]
   "adsat_agents" = ["skills/**/*.md"]
   ```
 - Ship a CLI command `analytics-agents install-skills` that copies bundled SKILL.md files
-  to the correct Cowork skills directory using `importlib.resources` + `shutil.copy`
+  to the correct Cowork / Claude Code skills directory using `importlib.resources` + `shutil.copy`
 - Path resolution uses `platformdirs` (user_data_dir) — works across macOS, Windows, Linux
 - **`platformdirs` is a new dependency — flag it and wait for confirmation before adding
   to `pyproject.toml`**
@@ -494,6 +521,7 @@ broken behaviour with no clear error. Bundling enforces version alignment automa
   analytics-agents = "adsat_agents.cli:main"
   ```
 - README already caveats this as "coming in a future release" — update when implemented
+- When implemented, document the Claude Desktop ZIP upload path separately in the README
 
 ---
 
