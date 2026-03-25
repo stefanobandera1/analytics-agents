@@ -10,16 +10,15 @@ readme = "README.md"
 license = "MIT"
 authors = [{ name = "Stefano Bandera", email = "mr.stefanobandera@gmail.com" }]
 requires-python = ">=3.9"
+dependencies = [
+    "adsat>=0.5.0",
+    "mcp>=1.26.0",
+]
 
 [project.urls]
 Homepage = "https://github.com/stefanobandera1/analytics-agents"
 Repository = "https://github.com/stefanobandera1/analytics-agents"
 Issues = "https://github.com/stefanobandera1/analytics-agents/issues"
-
-dependencies = [
-    "adsat>=0.5.0",
-    "mcp>=1.26.0",
-]
 
 [project.optional-dependencies]
 dev = [
