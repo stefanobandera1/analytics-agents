@@ -10,6 +10,14 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [0.1.2] – 2026-03-25
+
+### Fixed
+- `requires-python` raised from `>=3.9` to `>=3.10` — `mcp>=1.26.0` has no release
+  compatible with Python 3.9; CI matrix updated accordingly
+
+---
+
 ## [0.1.1] – 2026-03-25
 
 ### Fixed
